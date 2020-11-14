@@ -9,6 +9,7 @@
 #include <math.h> /* for pow */
 
 int status = 0;
+int fp;
 
 static float user_func_next(struct expr_func *f, vec_expr_t args, void *c)
 {
@@ -25,8 +26,7 @@ static struct expr_func user_funcs[] = {
 static void test_benchmark(const char *s)
 {
     struct timeval t;
-    gettimeofday(&t, NULL);
-    double start = t.tv_sec + t.tv_usec * 1e-6;
+    float result ;
     struct expr_var_list vars = { 0 };
     struct expr *e = expr_create(s, strlen(s), &vars, user_funcs);
     if (e == NULL) {
@@ -36,32 +36,33 @@ static void test_benchmark(const char *s)
     }
     long N = 1000000L;
     for (long i = 0; i < N; i++) {
-        expr_eval(e);
+        result = expr_eval(e);
     }
-    gettimeofday(&t, NULL);
-    double end = t.tv_sec + t.tv_usec * 1e-6;
     expr_destroy(e, &vars);
-    double ns = 1000000000 * (end - start) / N;
-    printf("BENCH %40s:\t%f ns/op (%dM op/sec)\n", s, ns, (int)(1000 / ns));
+
+
+    //---
+    ssize_t value = write(fp,s,strlen(s));
+    printf("value = %ld\n",value);
+    //---
+
+
+
+    printf("BENCH MathEx: %s = %.5f \n", s, result);
 }
 
 int main()
 {
-    test_benchmark("5");
-    test_benchmark("5+5+5+5+5+5+5+5+5+5");
-    test_benchmark("5*5*5*5*5*5*5*5*5*5");
-    test_benchmark("5,5,5,5,5,5,5,5,5,5");
-    test_benchmark("((5+5)+(5+5))+((5+5)+(5+5))+(5+5)");
-    test_benchmark("x=5");
-    test_benchmark("x=5,x+x+x+x+x+x+x+x+x+x");
-    test_benchmark("x=5,((x+x)+(x+x))+((x+x)+(x+x))+(x+x)");
-    test_benchmark("a=1,b=2,c=3,d=4,e=5,f=6,g=7,h=8,i=9,j=10");
-    test_benchmark("a=1,a=2,a=3,a=4,a=5,a=6,a=7,a=8,a=9,a=10");
-    test_benchmark("$(sqr,$1*$1),5*5");
-    test_benchmark("$(sqr,$1*$1),sqr(5)");
-    test_benchmark("x=2+3*(x/(42+next(x))),x");
-    test_benchmark("a,b,c,d,e,d,e,f,g,h,i,j,k");
-    test_benchmark("$(a,1),$(b,2),$(c,3),$(d,4),5");
+    fp = open("/dev/calc",02);
+    if(fp < 0){ 
+        printf("fp =%d\n",fp);
+        exit(1);
+    }
+    printf("---Start Bench---\n");
+    
+    test_benchmark("5.6*5.8");
 
+    printf("---End Bench---\n");
+    close(fp);
     return 0;
 }
