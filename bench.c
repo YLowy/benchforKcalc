@@ -56,9 +56,9 @@ static void test_benchmark(const char *s)
     float kout = eval(kresult);
     //---
     if(kout == result)
-        printf("BENCH [PASS] %s  MathEx: %.5f kcalc-fixed: %.5f \n ", s, result, kout);
+        printf("BENCH [PASS] %s  MathEx: %.7f kcalc-fixed: %.7f\n ", s, result, kout);
     else 
-        printf("BENCH [X] %s  MathEx: %.5f kcalc-fixed: %.5f \n ", s, result, kout);
+        printf("BENCH [X] %s  MathEx: %.7f kcalc-fixed: %.7f\n ", s, result, kout);
 
 }
 
@@ -70,11 +70,11 @@ int main()
     }
     printf("---Start Bench---\n");
     
-    test_benchmark("10+1.1");
-    test_benchmark("10*1.1");
-    test_benchmark("10/1.1");
-    test_benchmark("10-1.1");
-    test_benchmark("1.1*1.1");
+    test_benchmark("2147483647*2147483647");
+    test_benchmark("1.11*10.001");
+    test_benchmark("3.5*3.5");
+    test_benchmark("100*15");
+    test_benchmark("-15*6");
 
     printf("---End Bench---\n");
     close(fp);
